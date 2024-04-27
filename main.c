@@ -76,7 +76,7 @@ void Task_Communication(void *argument)
 {
   while (1)
   {
-    // Simulate receiving a value from STM32 (replace with actual code to receive value)
+    
     received_angle = 90; // Example angle received from STM32
 
     // Send received angle to servo task
