@@ -63,12 +63,26 @@ int main(void)
 /* Task function for controlling servo motor */
 void Task_Servo(void *argument)
 {
-  while (1)
-  {
-    // Set PWM duty cycle for servo motor using HAL_TIM_PWM_Start()
+	while (1)
+	  {
+	    // Calculate duty cycle based on servo angle
+	    uint16_t duty_cycle = SERVO_MIN_DUTY_CYCLE +
+	                          ((servo_angle - SERVO_MIN_ANGLE) *
+	                          (SERVO_MAX_DUTY_CYCLE - SERVO_MIN_DUTY_CYCLE)) /
+	                          (SERVO_MAX_ANGLE - SERVO_MIN_ANGLE);
 
-    osDelay(20); // Adjust delay as needed
-  }
+	    // Set PWM duty cycle for servo motor
+	    TIM_OC_InitTypeDef sConfigOC;
+	    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+	    sConfigOC.Pulse = duty_cycle;
+	    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+	    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+	    HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1);
+	    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+
+	    osDelay(20); // Adjust delay as needed
+	  }
+
 }
 
 /* Task function for communication */
@@ -76,7 +90,7 @@ void Task_Communication(void *argument)
 {
   while (1)
   {
-    
+
     received_angle = 90; // Example angle received from STM32
 
     // Send received angle to servo task
